@@ -1,0 +1,44 @@
+trigger: 
+- nain
+- feature/*
+pool: devops-pool
+stages:
+  - stage: testingstage
+    jobs:
+      - job: tflinttfsec
+        displayName: terraform testing job
+        steps:
+        - task: AzureCLI@2
+          inputs:
+            azureSubscription: 'devops-connection'
+            scriptType: 'ps'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              tflint
+              tfsec
+            workingDirectory: 
+  - stage: buildstage
+    jobs:
+      - job: 
+        displayName: terraform build
+        steps:
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+            backendServiceArm: 'devops-connection'
+            backendAzureRmStorageAccountName: 'stgannu2112'
+            backendAzureRmContainerName: 'stgannu2112'
+            backendAzureRmKey: 'dev.terraform.tfstate'
+
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'validate'
+        - task: TerraformTask@5
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+            environmentServiceNameAzureRM: 'devops-connection'
