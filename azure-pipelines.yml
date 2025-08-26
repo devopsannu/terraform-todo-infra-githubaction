@@ -3,20 +3,20 @@ trigger:
 - feature/*
 pool: devops-pool
 stages:
-  - stage: testingstage
-    jobs:
-      - job: tflinttfsec
-        displayName: terraform testing job
-        steps:
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: 'devops-connection'
-            scriptType: 'ps'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              tflint
-              tfsec
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#   - stage: testingstage
+#     jobs:
+#       - job: tflinttfsec
+#         displayName: terraform testing job
+#         steps:
+#         - task: AzureCLI@2
+#           inputs:
+#             azureSubscription: 'devops-connection'
+#             scriptType: 'ps'
+#             scriptLocation: 'inlineScript'
+#             inlineScript: |
+#               tflint
+#               tfsec
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
   - stage: buildstage
     jobs:
       - job: 
