@@ -10,7 +10,7 @@ stages:
 #         steps:
 #         - task: AzureCLI@2
 #           inputs:
-#             azureSubscription: 'devops-connection'
+#             azureSubscription: 'terraform-infra'
 #             scriptType: 'ps'
 #             scriptLocation: 'inlineScript'
 #             inlineScript: |
@@ -27,7 +27,7 @@ stages:
             provider: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            backendServiceArm: 'devops-connection'
+            backendServiceArm: 'terraform-infra'
             backendAzureRmStorageAccountName: 'stgannu2112'
             backendAzureRmContainerName: 'stgannu2112'
             backendAzureRmKey: 'dev.terraform.tfstate'
@@ -41,4 +41,4 @@ stages:
             provider: 'azurerm'
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            environmentServiceNameAzureRM: 'devops-connection'
+            environmentServiceNameAzureRM: 'terraform-infra'
