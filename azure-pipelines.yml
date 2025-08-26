@@ -16,7 +16,7 @@ stages:
             inlineScript: |
               tflint
               tfsec
-            workingDirectory: 
+            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
   - stage: buildstage
     jobs:
       - job: 
