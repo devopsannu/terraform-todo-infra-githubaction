@@ -1,62 +1,209 @@
-trigger: 
-- main
-- feature/*
+# trigger: 
+# - main
+# - feature/*
+# pool: devops-pool
+
+# variables:
+#   workdir: '$(System.DefaultWorkingDirectory)/environments/dev'
+
+# parameters:
+#   - name: runscanning
+#     displayName: run scanning job
+#     type: string
+#     default: true
+#     values:
+#       - "true"
+#       - "false"
+
+# stages:
+#   - stage: testingstage
+#     jobs:
+#       - job: tflinttfsec
+#         displayName: terraform testing job
+#         steps:
+#         - task: AzureCLI@2
+#           inputs:
+#             azureSubscription: 'terraform-infra'
+#             scriptType: 'ps'
+#             scriptLocation: 'inlineScript'
+#             inlineScript: |
+#               tflint
+#               #  tfsec
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#   - stage: buildstage
+#     jobs:
+#       - job: 
+#         displayName: terraform build
+#         steps:
+#         - task: TerraformTask@5
+#           displayName: terraform init
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'init'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             backendServiceArm: 'terraform-infra'
+#             backendAzureRmStorageAccountName: 'stgannu2112'
+#             backendAzureRmContainerName: 'stgannu2112'
+#             backendAzureRmKey: 'dev.terraform.tfstate'
+
+#         - task: TerraformTask@5
+#           displayName: terraform validat
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'validate'
+#         - task: TerraformTask@5
+#           displayName: terraform plan
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'plan'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             environmentServiceNameAzureRM: 'terraform-infra'
+#   - stage: validationstage
+#     jobs:
+#       - job: 
+#         displayName: manualvalidation
+#         steps:
+#         - task: ManualValidation@1
+#           timeoutInMinutes: 40
+#           inputs:
+#             notifyUsers: 'devopsannu@gmail.com'
+#             instructions: please review the code and approve
+
+#     pool: server
+#     condition: succeeded()
+#     dependsOn: buildstage
+
+#   - stage: terraformapply
+#     jobs:
+#       - job: 
+#         displayName: terraform apply
+#         dependsOn: validationstage
+#         condition: succeeded()
+#         steps:
+#         - task: TerraformTask@5
+#           displayName: terraform init
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'init'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             backendServiceArm: 'terraform-infra'
+#             backendAzureRmStorageAccountName: 'stgannu2112'
+#             backendAzureRmContainerName: 'stgannu2112'
+#             backendAzureRmKey: 'dev.terraform.tfstate'
+#         - task: TerraformTask@5
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'apply'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             commandOptions: '-auto-approve'
+#             environmentServiceNameAzureRM: 'terraform-infra'
+
+trigger:
+  - main
+  - feature/*
+
 pool: devops-pool
+
+variables:
+  workdir: '$(System.DefaultWorkingDirectory)/environments/dev'
+
+parameters:
+  - name: runscanning
+    displayName: Run scanning job
+    type: string
+    default: true
+    values:
+      - "true"
+      - "false"
+
 stages:
   - stage: testingstage
+    condition: eq('${{ parameters.runscanning }}', 'true')
     jobs:
       - job: tflinttfsec
-        displayName: terraform testing job
+        displayName: Terraform Testing Job
         steps:
-        - task: AzureCLI@2
-          inputs:
-            azureSubscription: 'terraform-infra'
-            scriptType: 'ps'
-            scriptLocation: 'inlineScript'
-            inlineScript: |
-              tflint
-               tfsec
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'terraform-infra'
+              scriptType: 'ps'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                tflint
+                # tfsec
+              workingDirectory: '$(workdir)'
+
   - stage: buildstage
     jobs:
-      - job: 
-        displayName: terraform build
+      - job: terraform_build
+        displayName: Terraform Build
         steps:
-        - task: TerraformTask@5
-          displayName: terraform init
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            backendServiceArm: 'terraform-infra'
-            backendAzureRmStorageAccountName: 'stgannu2112'
-            backendAzureRmContainerName: 'stgannu2112'
-            backendAzureRmKey: 'dev.terraform.tfstate'
+          - task: TerraformTask@5
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(workdir)'
+              backendServiceArm: 'terraform-infra'
+              backendAzureRmStorageAccountName: 'stgannu2112'
+              backendAzureRmContainerName: 'stgannu2112'
+              backendAzureRmKey: 'dev.terraform.tfstate'
 
-        - task: TerraformTask@5
-          displayName: terraform validat
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-        - task: TerraformTask@5
-          displayName: terraform plan
-          inputs:
-            provider: 'azurerm'
-            command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            environmentServiceNameAzureRM: 'terraform-infra'
+          - task: TerraformTask@5
+            displayName: Terraform Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(workdir)'
+              environmentServiceNameAzureRM: 'terraform-infra'
+
+          - task: TerraformTask@5
+            displayName: Terraform Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(workdir)'
+              environmentServiceNameAzureRM: 'terraform-infra'
+
   - stage: validationstage
-    jobs:
-      - job: 
-        displayName: manualvalidation
-        steps:
-        - task: ManualValidation@1
-          timeoutInMinutes: 40
-          inputs:
-            notifyUsers: 'devopsannu@gmail.com'
-            instructions: please review the code and approve
-
-    pool: server
-    condition: succeeded()
+    displayName: Manual Validation
     dependsOn: buildstage
-        
+    condition: succeeded()
+    pool: server
+    jobs:
+      - job: manualvalidation
+        displayName: Manual Validation
+        steps:
+          - task: ManualValidation@1
+            timeoutInMinutes: 40
+            inputs:
+              notifyUsers: 'devopsannu@gmail.com'
+              instructions: Please review the plan output and approve before applying.
+
+  - stage: terraformapply
+    displayName: Terraform Apply
+    dependsOn: validationstage
+    condition: succeeded()
+    jobs:
+      - job: terraform_apply
+        displayName: Terraform Apply Job
+        steps:
+          - task: TerraformTask@5
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(workdir)'
+              backendServiceArm: 'terraform-infra'
+              backendAzureRmStorageAccountName: 'stgannu2112'
+              backendAzureRmContainerName: 'stgannu2112'
+              backendAzureRmKey: 'dev.terraform.tfstate'
+
+          - task: TerraformTask@5
+            displayName: Terraform Apply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(workdir)'
+              commandOptions: '-auto-approve'
+              environmentServiceNameAzureRM: 'terraform-infra'
