@@ -23,6 +23,7 @@ stages:
         displayName: terraform build
         steps:
         - task: TerraformTask@5
+          displayName: terraform init
           inputs:
             provider: 'azurerm'
             command: 'init'
@@ -33,10 +34,12 @@ stages:
             backendAzureRmKey: 'dev.terraform.tfstate'
 
         - task: TerraformTask@5
+          displayName: terraform validat
           inputs:
             provider: 'azurerm'
             command: 'validate'
         - task: TerraformTask@5
+          displayName: terraform plan
           inputs:
             provider: 'azurerm'
             command: 'plan'
