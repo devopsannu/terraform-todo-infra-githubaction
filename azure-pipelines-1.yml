@@ -45,3 +45,18 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
             environmentServiceNameAzureRM: 'terraform-infra'
+  - stage: validationstage
+    jobs:
+      - job: 
+        displayName: manualvalidation
+        steps:
+        - task: ManualValidation@1
+          timeoutInMinutes: 40
+          inputs:
+            notifyUsers: 'devopsannu@gmail.com'
+            instructions: please review the code and approve
+
+    pool: server
+    condition: succeeded()
+    dependsOn: buildstage
+        
