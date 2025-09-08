@@ -25,10 +25,10 @@ parameters:
       - "false"
 
 stages:
-  - stage: Terrafor build stage
+  - stage: terraforbuildstage
     jobs:
       - job: 
-        displayName: Terraform build
+        displayName: terraform build
         steps:
         - task: TerraformTask@5
           inputs:
@@ -60,7 +60,7 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
             environmentServiceNameAzureRM: 'terraform-infra'
 
-  - stage: Terraform code scanning
+  - stage: terraformcodescanning
     jobs:
       - job: tflinttfsec
         displayName: terraform testing job
