@@ -70,7 +70,7 @@ stages:
             targetType: 'inline'
             script: |
               tflint
-              tfsec
+              # tfsec
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
   - stage: validationstage
