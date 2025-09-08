@@ -76,7 +76,9 @@ stages:
 
   - stage: validationstage
     displayName: Manual Validation
-    dependsOn: terraforbuildstage
+    dependsOn: 
+     - terraforbuildstage
+     - terraformcodescanning
     condition: succeeded()
     pool: server
     jobs:
