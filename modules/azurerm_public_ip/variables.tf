@@ -1,4 +1,4 @@
-variable "sa_name" {}
+variable "pip_name" {}
 variable "rg_name" {}
 variable "rg_location" {}
-variable "sa_tags" {}
+variable "rg_tags" {}

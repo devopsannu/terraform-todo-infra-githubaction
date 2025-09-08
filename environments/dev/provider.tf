@@ -1,17 +1,17 @@
 terraform {
                 required_version = ">=1.10.0"
-  backend "azurerm" {
-    resource_group_name  = "rg-anupam"
-    storage_account_name = "stgannu2112"
-    container_name       = "stgannu2112"
-    key                  = "dev.terraform.tfstate"
+  # backend "azurerm" {
+  #   resource_group_name  = "rg-anupam"
+  #   storage_account_name = "stgannu2112"
+  #   container_name       = "stgannu2112"
+  #   key                  = "dev.terraform.tfstate"
 
-  }
+  # }
   required_providers {
    
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.40.0"
+      version = "4.43.0"
     }
   }
 }
