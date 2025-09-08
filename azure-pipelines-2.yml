@@ -49,7 +49,7 @@ stages:
         - task: CmdLine@2
           displayName: fmt
           inputs:
-            script: 'fmt'
+            script: 'terraform fmt'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
         - task: TerraformTask@5
