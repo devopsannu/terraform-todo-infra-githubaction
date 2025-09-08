@@ -70,7 +70,21 @@ stages:
             targetType: 'inline'
             script: |
               tflint
-              # tfsec
+              tfsec
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-        
 
+  - stage: validationstage
+    displayName: Manual Validation
+    dependsOn: terraforbuildstage
+    condition: succeeded()
+    pool: server
+    jobs:
+      - job: manualvalidation
+        displayName: Manual Validation
+        steps:
+          - task: ManualValidation@1
+            timeoutInMinutes: 40
+            inputs:
+              notifyUsers: 'devopsannu@gmail.com'
+              approvers: 'devopsannu@gmail.com'
+              instructions: Please review the plan output and approve before applying.
