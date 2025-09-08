@@ -59,6 +59,7 @@ stages:
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
             environmentServiceNameAzureRM: 'terraform-infra'
+            commandOptions: '-out=tfplan'
 
   - stage: terraformcodescanning
     condition: eq('${{ parameters.runscanning }}', 'true')
