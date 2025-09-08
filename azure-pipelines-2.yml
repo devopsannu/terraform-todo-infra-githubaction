@@ -61,6 +61,7 @@ stages:
             environmentServiceNameAzureRM: 'terraform-infra'
 
   - stage: terraformcodescanning
+    condition: eq('${{ parameters.runscanning }}', 'true')
     jobs:
       - job: tflinttfsec
         displayName: terraform testing job
