@@ -1,4 +1,4 @@
-variable "sa_name" {}
+variable "nic_name" {}
 variable "rg_name" {}
 variable "rg_location" {}
-variable "sa_tags" {}
+variable "subnet_id" {}

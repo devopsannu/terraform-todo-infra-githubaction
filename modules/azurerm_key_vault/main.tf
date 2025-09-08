@@ -4,7 +4,7 @@ data "azurerm_client_config" "current" {}
 
 resource "azurerm_key_vault" "key_vault" {
   name                        = var.kv_name
-  location                    = var.location
+  location                    = var.rg_location
   resource_group_name         = var.rg_name
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
@@ -24,6 +24,11 @@ resource "azurerm_key_vault" "key_vault" {
 
     secret_permissions = [
       "Get",
+    "List",
+    "Set",
+    "Delete",
+    "Recover",
+    "Purge",
     ]
 
     storage_permissions = [

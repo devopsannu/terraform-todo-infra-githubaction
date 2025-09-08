@@ -1,0 +1,18 @@
+
+🔹 *Modules banao* for:
+ • *Resource Group (RG)*
+ • *VNet + Subnet*
+ • *2 Linux VMs*
+ • *Bastion Host*
+ • *Key Vault (KV)*
+ • *Database (DB)*
+
+1. *Init, **Fmt, **Validate, **Plan*
+2. *TFsec, **TFLint* Scans
+3. *Manual Approval* ➡️ then *Apply*
+
+### 🚀 *Azure Landing Zone (Terraform)*
+
+Provision:
+
+* *RG, **VNet (2 subnets), **2 VMs, **SQL DB, **Storage, **Public IP, **Key Vault, **Bastion, **Load Balancer, **NSG*
