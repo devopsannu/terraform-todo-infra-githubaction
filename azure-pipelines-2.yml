@@ -180,38 +180,38 @@ stages:
             inputs:
               provider: 'azurerm'
               command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
               backendServiceArm: 'terraform-infra'
               backendAzureRmStorageAccountName: 'stgannu2112'
               backendAzureRmContainerName: 'stgannu2112'
-              backendAzureRmKey: '$(parameters.environment).terraform.tfstate'
+              backendAzureRmKey: 'dev.terraform.tfstate'
 
           - task: TerraformTask@5
             displayName: Terraform Validate
             inputs:
               provider: 'azurerm'
               command: 'validate'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
           - task: CmdLine@2
             displayName: Terraform FMT
             inputs:
               script: 'terraform fmt'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev)'
 
           - task: TerraformTask@5
             displayName: Terraform Plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$dev'
               environmentServiceNameAzureRM: 'terraform-infra'
               commandOptions: '-out=tfplan'
 
           - task: PublishPipelineArtifact@1
             displayName: Publish tfplan Artifact
             inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)/tfplan'
+              targetPath: '$(System.DefaultWorkingDirectory)/environments/dev/tfplan'
               artifact: 'tfplan'
               publishLocation: 'pipeline'
 
@@ -228,7 +228,7 @@ stages:
               script: |
                 tflint
                 # tfsec
-              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
 # ------------------ Manual Approval ------------------
   - stage: validationstage
@@ -268,9 +268,9 @@ stages:
                   displayName: Download tfplan Artifact
                   inputs:
                     artifact: tfplan
-                    path: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+                    path: '$(System.DefaultWorkingDirectory)/environments/dev'
 
-                - script: dir $(System.DefaultWorkingDirectory)/environments/$(parameters.environment)
+                - script: dir $(System.DefaultWorkingDirectory)/environments/dev
                   displayName: Debug - Check tfplan File
 
                 - task: TerraformTask@5
@@ -278,18 +278,18 @@ stages:
                   inputs:
                     provider: 'azurerm'
                     command: 'init'
-                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
                     backendServiceArm: 'terraform-infra'
                     backendAzureRmStorageAccountName: 'stgannu2112'
                     backendAzureRmContainerName: 'stgannu2112'
-                    backendAzureRmKey: '$(parameters.environment).terraform.tfstate'
+                    backendAzureRmKey: 'dev.terraform.tfstate'
 
                 - task: TerraformTask@5
                   displayName: Terraform Apply Using tfplan
                   inputs:
                     provider: 'azurerm'
                     command: 'apply'
-                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
                     commandOptions: 'tfplan'
                     environmentServiceNameAzureRM: 'terraform-infra'
 
