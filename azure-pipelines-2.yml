@@ -60,6 +60,14 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
             environmentServiceNameAzureRM: 'terraform-infra'
             commandOptions: '-out=tfplan'
+        - task: PublishPipelineArtifact@1
+          displayName: publish plan
+          inputs:
+            targetPath: '$(Pipeline.Workspace)'
+            artifact: 'tfplan'
+            publishLocation: 'pipeline'
+        
+
 
   - stage: terraformcodescanning
     condition: eq('${{ parameters.runscanning }}', 'true')
@@ -92,3 +100,31 @@ stages:
               notifyUsers: 'devopsannu@gmail.com'
               approvers: 'devopsannu@gmail.com'
               instructions: Please review the plan output and approve before applying.
+
+  # - stage: terraformapply
+  #   displayName: Terraform Apply
+  #   dependsOn: validationstage
+  #   condition: succeeded()
+  #   jobs:
+  #     - job: terraform_apply
+  #       displayName: Terraform Apply Job
+  #       steps:
+  #         - task: TerraformTask@5
+  #           displayName: Terraform Init
+  #           inputs:
+  #             provider: 'azurerm'
+  #             command: 'init'
+  #             workingDirectory: '$(workdir)'
+  #             backendServiceArm: 'terraform-infra'
+  #             backendAzureRmStorageAccountName: 'stgannu2112'
+  #             backendAzureRmContainerName: 'stgannu2112'
+  #             backendAzureRmKey: 'dev.terraform.tfstate'
+
+  #         - task: TerraformTask@5
+  #           displayName: Terraform Apply
+  #           inputs:
+  #             provider: 'azurerm'
+  #             command: 'apply'
+  #             workingDirectory: '$(workdir)'
+  #             commandOptions: '-auto-approve'
+  #             environmentServiceNameAzureRM: 'terraform-infra'
