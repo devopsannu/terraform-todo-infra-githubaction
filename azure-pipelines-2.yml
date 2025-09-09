@@ -123,7 +123,7 @@ stages:
                 inputs:
                   provider: 'azurerm'
                   command: 'init'
-                  workingDirectory: '$(workdir)'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
                   backendServiceArm: 'terraform-infra'
                   backendAzureRmStorageAccountName: 'stgannu2112'
                   backendAzureRmContainerName: 'stgannu2112'
@@ -135,6 +135,6 @@ stages:
                   provider: 'azurerm'
                   command: 'apply'
 
-                  workingDirectory: '$(workdir)'
+                  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
                   commandOptions: 'tfplan -auto-approve'
                   environmentServiceNameAzureRM: 'terraform-infra'
