@@ -1,8 +1,150 @@
-name: loadbalancer-projrct 
+# name: loadbalancer-projrct 
+
+# trigger:
+# - main
+# - feature/anu**
+
+# pool: devops-pool
+
+# parameters:
+#   - name: environment
+#     displayName: Select environment
+#     type: string
+#     default: dev
+#     values:
+#       - dev
+#       - test
+#       - prod
+
+#   - name: runscanning
+#     displayName: Run scanning job
+#     type: string
+#     default: "true"
+#     values:
+#       - "true"
+#       - "false"
+
+# stages:
+#   - stage: terraforbuildstage
+#     jobs:
+#       - job: 
+#         displayName: terraform build
+#         steps:
+#         - task: TerraformTask@5
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'init'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             backendServiceArm: 'terraform-infra'
+#             backendAzureRmStorageAccountName: 'stgannu2112'
+#             backendAzureRmContainerName: 'stgannu2112'
+#             backendAzureRmKey: 'dev.terraform.tfstate'
+        
+#         - task: TerraformTask@5
+#           displayName: Validate
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'validate'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#         - task: CmdLine@2
+#           displayName: fmt
+#           inputs:
+#             script: 'terraform fmt'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+
+#         - task: TerraformTask@5
+#           displayName: Plan
+#           inputs:
+#             provider: 'azurerm'
+#             command: 'plan'
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#             environmentServiceNameAzureRM: 'terraform-infra'
+#             commandOptions: '-out=tfplan'
+#         - task: PublishPipelineArtifact@1
+#           displayName: publish plan
+#           inputs:
+#             targetPath: '$(Pipeline.Workspace)'
+#             artifact: 'tfplan'
+#             publishLocation: 'pipeline'
+#         - task: DownloadPipelineArtifact@2
+#           inputs:
+#             buildType: 'current'
+#             artifactName: 'tfplan'
+#             targetPath: '$(Pipeline.Workspace)'
+
+
+#   - stage: terraformcodescanning
+#     condition: eq('${{ parameters.runscanning }}', 'true')
+#     jobs:
+#       - job: tflinttfsec
+#         displayName: terraform testing job
+#         steps:
+#         - task: PowerShell@2
+#           inputs:
+#             targetType: 'inline'
+#             script: |
+#               tflint
+#               # tfsec
+#             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+
+#   - stage: validationstage
+#     displayName: Manual Validation
+#     dependsOn: 
+#      - terraforbuildstage
+#      - terraformcodescanning
+#     condition: succeeded()
+#     pool: server
+#     jobs:
+#       - job: manualvalidation
+#         displayName: Manual Validation
+#         steps:
+#           - task: ManualValidation@1
+#             timeoutInMinutes: 40
+#             inputs:
+#               notifyUsers: 'devopsannu@gmail.com'
+#               approvers: 'devopsannu@gmail.com'
+#               instructions: Please review the plan output and approve before applying.
+
+#   - stage: terraformapply
+#     displayName: Terraform Apply
+#     dependsOn: validationstage
+#     condition: succeeded()
+#     jobs:
+#        - deployment: terraformapply
+#          displayName: terraform appply deployment job
+#          environment: dev  ##  This connects to your Azure DevOps environment named "Dev"
+#          strategy:
+#           runOnce:
+#             deploy:
+#              steps:
+# # it will not use job if deploying infra in the Environments
+#               - task: TerraformTask@5
+#                 displayName: Terraform Init
+#                 inputs:
+#                   provider: 'azurerm'
+#                   command: 'init'
+#                   workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#                   backendServiceArm: 'terraform-infra'
+#                   backendAzureRmStorageAccountName: 'stgannu2112'
+#                   backendAzureRmContainerName: 'stgannu2112'
+#                   backendAzureRmKey: 'dev.terraform.tfstate'
+
+#               - task: TerraformTask@5
+#                 displayName: Terraform Apply
+#                 inputs:
+#                   provider: 'azurerm'
+#                   command: 'apply'
+
+#                   workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+#                   commandOptions: 'tfplan'
+#                   environmentServiceNameAzureRM: 'terraform-infra'
+
+
+name: loadbalancer-project
 
 trigger:
-- main
-- feature/anu**
+  - main
+  - feature/anu**
 
 pool: devops-pool
 
@@ -25,73 +167,75 @@ parameters:
       - "false"
 
 stages:
+
+# ------------------ Build & Plan ------------------
   - stage: terraforbuildstage
     jobs:
-      - job: 
-        displayName: terraform build
+      - job: terraform_build
+        displayName: Terraform Build
         steps:
-        - task: TerraformTask@5
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            backendServiceArm: 'terraform-infra'
-            backendAzureRmStorageAccountName: 'stgannu2112'
-            backendAzureRmContainerName: 'stgannu2112'
-            backendAzureRmKey: 'dev.terraform.tfstate'
-        
-        - task: TerraformTask@5
-          displayName: Validate
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-        - task: CmdLine@2
-          displayName: fmt
-          inputs:
-            script: 'terraform fmt'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
-        - task: TerraformTask@5
-          displayName: Plan
-          inputs:
-            provider: 'azurerm'
-            command: 'plan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            environmentServiceNameAzureRM: 'terraform-infra'
-            commandOptions: '-out=tfplan'
-        - task: PublishPipelineArtifact@1
-          displayName: publish plan
-          inputs:
-            targetPath: '$(Pipeline.Workspace)'
-            artifact: 'tfplan'
-            publishLocation: 'pipeline'
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            buildType: 'current'
-            artifactName: 'tfplan'
-            targetPath: '$(Pipeline.Workspace)'
+          - task: TerraformTask@5
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              backendServiceArm: 'terraform-infra'
+              backendAzureRmStorageAccountName: 'stgannu2112'
+              backendAzureRmContainerName: 'stgannu2112'
+              backendAzureRmKey: '$(parameters.environment).terraform.tfstate'
 
+          - task: TerraformTask@5
+            displayName: Terraform Validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
 
+          - task: CmdLine@2
+            displayName: Terraform FMT
+            inputs:
+              script: 'terraform fmt'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+
+          - task: TerraformTask@5
+            displayName: Terraform Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+              environmentServiceNameAzureRM: 'terraform-infra'
+              commandOptions: '-out=tfplan'
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish tfplan Artifact
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)/tfplan'
+              artifact: 'tfplan'
+              publishLocation: 'pipeline'
+
+# ------------------ Code Scanning ------------------
   - stage: terraformcodescanning
     condition: eq('${{ parameters.runscanning }}', 'true')
     jobs:
       - job: tflinttfsec
-        displayName: terraform testing job
+        displayName: Terraform Testing Job
         steps:
-        - task: PowerShell@2
-          inputs:
-            targetType: 'inline'
-            script: |
-              tflint
-              # tfsec
-            workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: |
+                tflint
+                # tfsec
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
 
+# ------------------ Manual Approval ------------------
   - stage: validationstage
     displayName: Manual Validation
-    dependsOn: 
-     - terraforbuildstage
-     - terraformcodescanning
+    dependsOn:
+      - terraforbuildstage
+      - terraformcodescanning
     condition: succeeded()
     pool: server
     jobs:
@@ -105,36 +249,47 @@ stages:
               approvers: 'devopsannu@gmail.com'
               instructions: Please review the plan output and approve before applying.
 
+# ------------------ Apply ------------------
   - stage: terraformapply
     displayName: Terraform Apply
     dependsOn: validationstage
     condition: succeeded()
     jobs:
-       - deployment: terraformapply
-         displayName: terraform appply deployment job
-         environment: dev  ##  This connects to your Azure DevOps environment named "Dev"
-         strategy:
+      - deployment: terraform_apply
+        displayName: Terraform Apply Deployment Job
+        environment:
+         name: dev  # connects to the Azure DevOps Environment
+        strategy:
           runOnce:
             deploy:
-             steps:
-# it will not use job if deploying infra in the Environments
-              - task: TerraformTask@5
-                displayName: Terraform Init
-                inputs:
-                  provider: 'azurerm'
-                  command: 'init'
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-                  backendServiceArm: 'terraform-infra'
-                  backendAzureRmStorageAccountName: 'stgannu2112'
-                  backendAzureRmContainerName: 'stgannu2112'
-                  backendAzureRmKey: 'dev.terraform.tfstate'
+              steps:
 
-              - task: TerraformTask@5
-                displayName: Terraform Apply
-                inputs:
-                  provider: 'azurerm'
-                  command: 'apply'
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download tfplan Artifact
+                  inputs:
+                    artifact: tfplan
+                    path: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
 
-                  workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-                  commandOptions: 'tfplan'
-                  environmentServiceNameAzureRM: 'terraform-infra'
+                - script: dir $(System.DefaultWorkingDirectory)/environments/$(parameters.environment)
+                  displayName: Debug - Check tfplan File
+
+                - task: TerraformTask@5
+                  displayName: Terraform Init (Again)
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'init'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+                    backendServiceArm: 'terraform-infra'
+                    backendAzureRmStorageAccountName: 'stgannu2112'
+                    backendAzureRmContainerName: 'stgannu2112'
+                    backendAzureRmKey: '$(parameters.environment).terraform.tfstate'
+
+                - task: TerraformTask@5
+                  displayName: Terraform Apply Using tfplan
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'apply'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/$(parameters.environment)'
+                    commandOptions: 'tfplan'
+                    environmentServiceNameAzureRM: 'terraform-infra'
+
