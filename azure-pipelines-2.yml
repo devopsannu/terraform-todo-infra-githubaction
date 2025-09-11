@@ -136,7 +136,7 @@ stages:
                   command: 'apply'
 
                   workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-                  commandOptions: '$(Pipeline.Workspace)/tfplan'
+                  commandOptions: '-auto-approve "$(Pipeline.Workspace)/tfplan"'
                   environmentServiceNameAzureRM: 'terraform-infra1'
 
 
