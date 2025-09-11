@@ -60,17 +60,25 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
             environmentServiceNameAzureRM: 'terraform-infra1'
             commandOptions: '-out=tfplan'
+        # - task: PublishPipelineArtifact@1
+        #   displayName: publish plan
+        #   inputs:
+        #     # targetPath: '$(Pipeline.Workspace)'
+        #     artifact: 'tfplan'
+        #     publishLocation: 'pipeline'
         - task: PublishPipelineArtifact@1
-          displayName: publish plan
           inputs:
-            targetPath: '$(Pipeline.Workspace)'
+            targetPath: '$(System.DefaultWorkingDirectory)/environments/dev/tfplan'
             artifact: 'tfplan'
             publishLocation: 'pipeline'
         - task: DownloadPipelineArtifact@2
           inputs:
             buildType: 'current'
             artifactName: 'tfplan'
-            targetPath: '$(Pipeline.Workspace)'
+            targetPath: '$(Pipeline.Workspace)/tfplan-dir'
+            
+
+
 
 
   - stage: terraformcodescanning
