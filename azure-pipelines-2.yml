@@ -373,10 +373,10 @@ stages:
               commandOptions: '-out=tfplan'
 
           # ✅ Verify tfplan file exists
-          - task: CmdLine@2
-            displayName: List tfplan file
-            inputs:
-              script: 'dir $(System.DefaultWorkingDirectory)/environments/dev'
+          # - task: CmdLine@2
+          #   displayName: List tfplan file
+          #   inputs:
+          #     script: 'dir $(System.DefaultWorkingDirectory)/environments/dev'
 
           # ✅ Publish only the tfplan file
           - task: PublishPipelineArtifact@1
