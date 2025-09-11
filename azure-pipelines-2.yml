@@ -302,7 +302,6 @@
 #                     environmentServiceNameAzureRM: 'terraform-infra'
 
 #######################################################################################################################################################
-
 name: loadbalancer-project
 
 trigger:
@@ -330,15 +329,18 @@ parameters:
       - "false"
 
 stages:
-# -------------------------------------------
-# Terraform Build + Plan + Publish tfplan
-# -------------------------------------------
+# ------------------------------------------
+# Stage 1: Terraform Plan + Publish tfplan
+# ------------------------------------------
   - stage: terraforbuildstage
     jobs:
-      - job: 
+      - job: terraformbuild
         displayName: Terraform Build
         steps:
+          - checkout: self
+
           - task: TerraformTask@5
+            displayName: Terraform Init
             inputs:
               provider: 'azurerm'
               command: 'init'
@@ -349,7 +351,7 @@ stages:
               backendAzureRmKey: 'dev.terraform.tfstate'
 
           - task: TerraformTask@5
-            displayName: Validate
+            displayName: Terraform Validate
             inputs:
               provider: 'azurerm'
               command: 'validate'
@@ -362,7 +364,7 @@ stages:
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
           - task: TerraformTask@5
-            displayName: Plan
+            displayName: Terraform Plan
             inputs:
               provider: 'azurerm'
               command: 'plan'
@@ -370,34 +372,39 @@ stages:
               environmentServiceNameAzureRM: 'terraform-infra1'
               commandOptions: '-out=tfplan'
 
-          # ✅ ONLY publish the tfplan file
+          # ✅ Verify tfplan file exists
+          - task: CmdLine@2
+            displayName: List tfplan file
+            inputs:
+              script: 'dir $(System.DefaultWorkingDirectory)/environments/dev'
+
+          # ✅ Publish only the tfplan file
           - task: PublishPipelineArtifact@1
-            displayName: Publish tfplan
+            displayName: Publish tfplan artifact
             inputs:
               targetPath: '$(System.DefaultWorkingDirectory)/environments/dev/tfplan'
               artifact: 'tfplan'
-              publishLocation: 'pipeline'
 
-# -------------------------------------------
-# Optional Scanning Stage
-# -------------------------------------------
+# ------------------------------------------
+# Stage 2: Optional Code Scanning
+# ------------------------------------------
   - stage: terraformcodescanning
     condition: eq('${{ parameters.runscanning }}', 'true')
     jobs:
       - job: tflinttfsec
-        displayName: Terraform Testing Job
+        displayName: Terraform Code Scanning
         steps:
           - task: PowerShell@2
+            displayName: Run tflint
             inputs:
               targetType: 'inline'
               script: |
                 tflint
-                # tfsec
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
-# -------------------------------------------
-# Manual Validation Stage
-# -------------------------------------------
+# ------------------------------------------
+# Stage 3: Manual Approval
+# ------------------------------------------
   - stage: validationstage
     displayName: Manual Validation
     dependsOn: 
@@ -406,26 +413,26 @@ stages:
     condition: succeeded()
     pool: server
     jobs:
-      - job: manualvalidation
-        displayName: Manual Validation
+      - job: manualapproval
+        displayName: Wait for Manual Approval
         steps:
           - task: ManualValidation@1
-            timeoutInMinutes: 40
             inputs:
               notifyUsers: 'devopsannu@gmail.com'
               approvers: 'devopsannu@gmail.com'
-              instructions: Please review the plan output and approve before applying.
+              instructions: 'Please review the Terraform plan and approve to continue.'
+              timeoutInMinutes: 30
 
-# -------------------------------------------
-# Terraform Apply Stage (fixed)
-# -------------------------------------------
+# ------------------------------------------
+# Stage 4: Terraform Apply
+# ------------------------------------------
   - stage: terraformapply
     displayName: Terraform Apply
     dependsOn: validationstage
     condition: succeeded()
     jobs:
-      - deployment: terraformapply
-        displayName: Terraform Apply Deployment Job
+      - deployment: applyterraform
+        displayName: Terraform Apply Job
         environment: dev
         strategy:
           runOnce:
@@ -434,13 +441,18 @@ stages:
                 - checkout: self
                   clean: true
 
-                # ✅ Download only the tfplan file
+                # ✅ Download tfplan artifact
                 - task: DownloadPipelineArtifact@2
-                  displayName: Download tfplan
+                  displayName: Download tfplan artifact
                   inputs:
-                    buildType: 'current'
                     artifactName: 'tfplan'
+                    buildType: 'current'
                     targetPath: '$(Pipeline.Workspace)/tfplan-dir'
+
+                - task: CmdLine@2
+                  displayName: List downloaded files
+                  inputs:
+                    script: 'dir $(Pipeline.Workspace)/tfplan-dir'
 
                 - task: TerraformTask@5
                   displayName: Terraform Init
@@ -453,7 +465,7 @@ stages:
                     backendAzureRmContainerName: 'stgannu2112'
                     backendAzureRmKey: 'dev.terraform.tfstate'
 
-                # ✅ Correct Apply - Use proper working dir and tfplan path
+                # ✅ Apply using downloaded tfplan
                 - task: TerraformTask@5
                   displayName: Terraform Apply
                   inputs:
