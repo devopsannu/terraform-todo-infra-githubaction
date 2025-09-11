@@ -447,7 +447,9 @@ stages:
                   inputs:
                     artifactName: 'tfplan'
                     buildType: 'current'
-                    targetPath: '$(Pipeline.Workspace)/tfplan-dir'
+                    targetPath: '$(Pipeline.Workspace)/tfplan'
+
+                
 
                 - task: CmdLine@2
                   displayName: List downloaded files
