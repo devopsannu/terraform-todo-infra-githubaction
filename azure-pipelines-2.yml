@@ -370,7 +370,7 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: Publish tfplan
             inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/environments/dev/tfplan'
+              targetPath: '$(System.DefaultWorkingDirectory)/environments/dev'
               artifact: 'tfplan'
               publishLocation: 'pipeline'
 
