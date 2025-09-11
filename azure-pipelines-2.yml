@@ -330,6 +330,9 @@ parameters:
       - "false"
 
 stages:
+# -------------------------------------------
+# Terraform Build + Plan + Publish tfplan
+# -------------------------------------------
   - stage: terraforbuildstage
     jobs:
       - job: 
@@ -344,7 +347,7 @@ stages:
               backendAzureRmStorageAccountName: 'stgannu2112'
               backendAzureRmContainerName: 'stgannu2112'
               backendAzureRmKey: 'dev.terraform.tfstate'
-          
+
           - task: TerraformTask@5
             displayName: Validate
             inputs:
@@ -367,13 +370,17 @@ stages:
               environmentServiceNameAzureRM: 'terraform-infra1'
               commandOptions: '-out=tfplan'
 
+          # ✅ ONLY publish the tfplan file
           - task: PublishPipelineArtifact@1
             displayName: Publish tfplan
             inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/environments/dev'
+              targetPath: '$(System.DefaultWorkingDirectory)/environments/dev/tfplan'
               artifact: 'tfplan'
               publishLocation: 'pipeline'
 
+# -------------------------------------------
+# Optional Scanning Stage
+# -------------------------------------------
   - stage: terraformcodescanning
     condition: eq('${{ parameters.runscanning }}', 'true')
     jobs:
@@ -388,6 +395,9 @@ stages:
                 # tfsec
               workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
 
+# -------------------------------------------
+# Manual Validation Stage
+# -------------------------------------------
   - stage: validationstage
     displayName: Manual Validation
     dependsOn: 
@@ -406,6 +416,9 @@ stages:
               approvers: 'devopsannu@gmail.com'
               instructions: Please review the plan output and approve before applying.
 
+# -------------------------------------------
+# Terraform Apply Stage (fixed)
+# -------------------------------------------
   - stage: terraformapply
     displayName: Terraform Apply
     dependsOn: validationstage
@@ -418,7 +431,10 @@ stages:
           runOnce:
             deploy:
               steps:
-                # Download the tfplan artifact first
+                - checkout: self
+                  clean: true
+
+                # ✅ Download only the tfplan file
                 - task: DownloadPipelineArtifact@2
                   displayName: Download tfplan
                   inputs:
@@ -437,11 +453,12 @@ stages:
                     backendAzureRmContainerName: 'stgannu2112'
                     backendAzureRmKey: 'dev.terraform.tfstate'
 
+                # ✅ Correct Apply - Use proper working dir and tfplan path
                 - task: TerraformTask@5
                   displayName: Terraform Apply
                   inputs:
                     provider: 'azurerm'
                     command: 'apply'
-                    workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-                    commandOptions: '-auto-approve "$(Pipeline.Workspace)/tfplan-dir/tfplan"'
+                    workingDirectory: '$(Pipeline.Workspace)/tfplan-dir'
+                    commandOptions: '-auto-approve tfplan'
                     environmentServiceNameAzureRM: 'terraform-infra1'
