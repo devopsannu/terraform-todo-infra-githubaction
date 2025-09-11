@@ -35,7 +35,7 @@ stages:
             provider: 'azurerm'
             command: 'init'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            backendServiceArm: 'terraform-infra'
+            backendServiceArm: 'terraform-infra1'
             backendAzureRmStorageAccountName: 'stgannu2112'
             backendAzureRmContainerName: 'stgannu2112'
             backendAzureRmKey: 'dev.terraform.tfstate'
@@ -58,7 +58,7 @@ stages:
             provider: 'azurerm'
             command: 'plan'
             workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-            environmentServiceNameAzureRM: 'terraform-infra'
+            environmentServiceNameAzureRM: 'terraform-infra1'
             commandOptions: '-out=tfplan'
         - task: PublishPipelineArtifact@1
           displayName: publish plan
@@ -124,7 +124,7 @@ stages:
                   provider: 'azurerm'
                   command: 'init'
                   workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
-                  backendServiceArm: 'terraform-infra'
+                  backendServiceArm: 'terraform-infra1'
                   backendAzureRmStorageAccountName: 'stgannu2112'
                   backendAzureRmContainerName: 'stgannu2112'
                   backendAzureRmKey: 'dev.terraform.tfstate'
@@ -137,7 +137,7 @@ stages:
 
                   workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
                   commandOptions: '$(Pipeline.Workspace)/tfplan'
-                  environmentServiceNameAzureRM: 'terraform-infra'
+                  environmentServiceNameAzureRM: 'terraform-infra1'
 
 
 # name: loadbalancer-project
