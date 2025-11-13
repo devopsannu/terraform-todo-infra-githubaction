@@ -1,0 +1,5 @@
+# data "azurerm_key_vault" "kv_data" {
+#   name                = var.key_vault_name
+#   resource_group_name = var.rg_name
+# }
+

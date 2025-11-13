@@ -1,0 +1,37 @@
+f99e2da2be7/resourceGroups/express_rg/providers/Microsoft.Network/bastionHosts/AzureBastionSubnet]
+╷
+│ Error: A resource with the ID "https://expresskv1234.vault.azure.net/secrets/anupamsecret/65ebbf109e2f475c994e564401c7e26f" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+f99e2da2be7/resourceGroups/express_rg/providers/Microsoft.Network/bastionHosts/AzureBastionSubnet]
+╷
+│ Error: A resource with the ID "https://expresskv1234.vault.azure.net/secrets/anupamsecret/65ebbf109e2f475c994e564401c7e26f" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+╷
+│ Error: A resource with the ID "https://expresskv1234.vault.azure.net/secrets/anupamsecret/65ebbf109e2f475c994e564401c7e26f" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+│ Error: A resource with the ID "https://expresskv1234.vault.azure.net/secrets/anupamsecret/65ebbf109e2f475c994e564401c7e26f" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+ource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+│   on ..\..\modules\azurerm_key_vault_secret\main.tf line 13, in resource "azurerm_key_vault_secret" "secret":
+│   with module.secret_name.azurerm_key_vault_secret.secret,
+│   on ..\..\modules\azurerm_key_vault_secret\main.tf line 13, in resource "azurerm_key_vault_secret" "secret":
+│   on ..\..\modules\azurerm_key_vault_secret\main.tf line 13, in resource "azurerm_key_vault_secret" "secret":
+│   13: resource "azurerm_key_vault_secret" "secret" {
+│   13: resource "azurerm_key_vault_secret" "secret" {
+│
+╵
+╷
+│ Error: A resource with the ID "https://expresskv1234.vault.azure.net/secrets/anupamsecret1/ecbf325c496c4f40a9f4d596111326db" already exists - to be managed via Terraform this resource needs to be imported into the State. Please see the resource documentation for "azurerm_key_vault_secret" for more information.
+│
+│   with module.secret_name1.azurerm_key_vault_secret.secret,
+│   on ..\..\modules\azurerm_key_vault_secret\main.tf line 13, in resource "azurerm_key_vault_secret" "secret":
+│   13: resource "azurerm_key_vault_secret" "secret" {
+│
+╵
+PS D:\Github-actions-project\terraform-todo-infra-githubaction\env
